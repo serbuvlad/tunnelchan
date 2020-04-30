@@ -4,11 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
-	irc "github.com/fluffle/goirc/client"
 )
-
-var ch = make(chan *irc.Line)
 
 func main() {
 	// <1>: Config file
