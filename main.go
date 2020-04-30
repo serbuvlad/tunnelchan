@@ -22,19 +22,16 @@ func main() {
 		os.Exit(2)
 	}
 
-	// <2>: IRC
+	// <2>: IRC & Discord
 	ircData := ircConnect(cfg)
-
-	// <3>: Discord
 	discordData := discordConnect(cfg)
 
-	// <4>: Channels
 	for ircChannel, discordChannel := range cfg.Channels {
 		ircData.addChannel(ircChannel, discordData.session, discordChannel)
 		discordData.addChannel(discordChannel, ircData.conn, ircChannel)
 	}
 
-	// <5>: Block - we exit on fatal error or interrupt
+	// <3>: Block - we exit on fatal error or interrupt
 	block := make(chan struct{})
 	<-block
 }
