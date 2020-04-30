@@ -1,0 +1,12 @@
+---
+
+irc:
+  nick: tunnelchan
+  server: my.ircserver.example
+
+discord:
+  token: 'REDACTED'
+
+channels: # irc channel by name to discord channel by id
+  '#lounge': '625174570552722809'
+  '#support': '625174570552725567'
