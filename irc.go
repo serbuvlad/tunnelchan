@@ -15,45 +15,45 @@ type ircData struct {
 }
 
 func ircConnect(cfg *config) *ircData {
-	ircData := &ircData{}
-	ircData.channels = make(map[string]chan *irc.Line)
+	data := &ircData{}
+	data.channels = make(map[string]chan *irc.Line)
 
-	ircData.conn = irc.SimpleClient(cfg.Irc.Nick)
+	data.conn = irc.SimpleClient(cfg.Irc.Nick)
 
 	connected := make(chan struct{})
-	ircData.conn.HandleFunc(irc.CONNECTED, func(conn *irc.Conn, line *irc.Line) {
+	data.conn.HandleFunc(irc.CONNECTED, func(conn *irc.Conn, line *irc.Line) {
 		close(connected)
 	})
 
-	ircData.conn.HandleFunc(irc.DISCONNECTED, func(conn *irc.Conn, line *irc.Line) {
+	data.conn.HandleFunc(irc.DISCONNECTED, func(conn *irc.Conn, line *irc.Line) {
 		log.Fatal("Disconnected from IRC")
 	})
 
-	ircData.conn.HandleFunc(irc.PRIVMSG, func(conn *irc.Conn, line *irc.Line) {
+	data.conn.HandleFunc(irc.PRIVMSG, func(conn *irc.Conn, line *irc.Line) {
 		chans := line.Args[0]
 
 		// not correct: TODO fix
 		{
-			ch, ok := ircData.channels[chans]
+			ch, ok := data.channels[chans]
 			if ok {
 				ch <- line
 			}
 		}
 	})
 
-	err := ircData.conn.ConnectTo(cfg.Irc.Server)
+	err := data.conn.ConnectTo(cfg.Irc.Server)
 	if err != nil {
 		log.Fatal(err)
 	}
 	<-connected
 
-	return ircData
+	return data
 }
 
-func (ircData *ircData) addChannel(ircChannel string, discordSession *discord.Session, discordChannel string) {
+func (data *ircData) addChannel(ircChannel string, discordSession *discord.Session, discordChannel string) {
 	ch := make(chan *irc.Line)
-	ircData.channels[ircChannel] = ch
-	ircData.conn.Join(ircChannel)
+	data.channels[ircChannel] = ch
+	data.conn.Join(ircChannel)
 
 	go func() {
 		for line := range ch {
